@@ -6,6 +6,8 @@ const min_panel_width: float = 600
 const main_margins := Vector4i(5, 5, 0, 10)
 const container_margins := Vector4i(5, 30, 10, 5)
 const resize_button_width := 4
+const save_data_section := "addons"
+const save_data_panel_width := "scene_view_timemap_panel_width"
 
 @onready var panel: Control = %Panel
 @onready var margin_container: Control = %MarginContainer
@@ -41,7 +43,9 @@ func _ready() -> void:
 	margin_container.add_theme_constant_override("margin_bottom", margins.w)
 
 	await get_tree().process_frame
-	self.size.x = min_panel_width * editor_scale
+
+	var ed_settings := EditorInterface.get_editor_settings()
+	self.size.x = ed_settings.get_project_metadata(save_data_section, save_data_panel_width, min_panel_width * editor_scale)
 
 	resize_button.button_down.connect(_on_resize_button_down)
 	resize_button.button_up.connect(_on_resize_button_up)
@@ -115,7 +119,8 @@ func _on_resize_button_down() -> void:
 
 func _on_resize_button_up() -> void:
 	resizing = false
-
+	var ed_settings := EditorInterface.get_editor_settings()
+	ed_settings.set_project_metadata(save_data_section, save_data_panel_width, self.size.x)
 
 func _process_resizing() -> void:
 	var viewport_size :=  EditorInterface.get_editor_main_screen().size
